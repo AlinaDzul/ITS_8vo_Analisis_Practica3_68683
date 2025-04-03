@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Button from "../ui/button/Button";
 import { useForm } from "react-hook-form";
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { AuthServiceImpl } from "../../../infrastructure/services/AuthServiceImpl";
 import { LoginUseCase } from "../../../core/useCases/LoginUseCase";
 
@@ -16,17 +16,17 @@ export default function SignInForm() {
   const defaultValues = {
     email: "",
     password: "",
-  }
+  };
 
   const form = useForm({
     defaultValues: defaultValues,
     resolver: yupResolver(
       yup.object().shape({
-        email: yup.string().email().required('This field is required'),
-        password: yup.string().min(6).required('This field is required'),
+        email: yup.string().email().required("This field is required"),
+        password: yup.string().min(6).required("This field is required"),
       })
-    )
-  })
+    ),
+  });
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     const authService = new AuthServiceImpl();
@@ -35,11 +35,14 @@ export default function SignInForm() {
     if (user) {
       alert("Login successful");
       localStorage.setItem("token", user.token);
+      // Establece la expiración del token
+      const expirationTime = Date.now() + 60 * 1000; // 1 minuto
+      localStorage.setItem("tokenExpiration", expirationTime.toString());
       window.location.href = "/";
     } else {
       alert("Login failed");
     }
-  }
+  };
 
   return (
     <div className="flex flex-col flex-1">
@@ -73,8 +76,9 @@ export default function SignInForm() {
                     placeholder="info@gmail.com"
                     error={form.formState.errors.email ? true : false}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      form.setValue('email', e.target.value)
-                    }} />
+                      form.setValue("email", e.target.value);
+                    }}
+                  />
                 </div>
                 <div>
                   <Label>
@@ -86,7 +90,7 @@ export default function SignInForm() {
                       placeholder="Enter your password"
                       error={form.formState.errors.password ? true : false}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        form.setValue('password', e.target.value)
+                        form.setValue("password", e.target.value);
                       }}
                     />
                     <span
@@ -102,7 +106,11 @@ export default function SignInForm() {
                   </div>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm" onClick={form.handleSubmit(handleSubmit)}>
+                  <Button
+                    className="w-full"
+                    size="sm"
+                    onClick={form.handleSubmit(handleSubmit)}
+                  >
                     Sign in
                   </Button>
                 </div>
@@ -111,7 +119,7 @@ export default function SignInForm() {
 
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account? {""}
+                Don't have an account? {""}
                 <Link
                   to="/signup"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
